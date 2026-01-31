@@ -1132,8 +1132,8 @@ function Spy:ShowTooltip(self, show, id)
 					local guildLosses = yourTotalLosses
 					if playerData.guildStats then
 						for guildMember, stats in pairs(playerData.guildStats) do
-							-- Skip your own alts (already counted above)
-							local isYourAlt = stats.accountId and stats.accountId == Spy.AccountID
+							-- Skip your own character or alts (already counted above)
+							local isYourAlt = (stats.accountId and stats.accountId == Spy.AccountID) or (guildMember == Spy.CharacterName)
 							if not isYourAlt then
 								guildWins = guildWins + (stats.wins or 0)
 								guildLosses = guildLosses + (stats.losses or 0)

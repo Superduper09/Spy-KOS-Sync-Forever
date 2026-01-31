@@ -2848,6 +2848,8 @@ end
 -- Receive PvP update from guild
 function Spy:ReceiveKOSPvPUpdate(sender, enemyName, result, wins, losses, timestamp, accountId)
 	if not enemyName or enemyName == "" then return end
+	-- Skip if this is our own broadcast (we track our own stats in AccountStats)
+	if sender == Spy.CharacterName then return end
 
 	local playerData = SpyPerCharDB.PlayerData[enemyName]
 	if not playerData then
@@ -3389,15 +3391,38 @@ function Spy:ProcessKOSSyncData(sender, data)
 	end
 	SpyPerCharDB.KOSSyncTimes[sender] = time()
 
-	-- Show confirmation message
-	if Spy.db.profile.KOSSyncNotifications and entriesProcessed > 0 then
-		DEFAULT_CHAT_FRAME:AddMessage(L["SpySignatureColored"]..string.format(L["KOSSyncReceived"], sender, entriesProcessed))
-	end
+	-- Accumulate entries for summary notification (avoids spam from chunked syncs)
+	if entriesProcessed > 0 then
+		if not Spy.PendingSyncTotals then
+			Spy.PendingSyncTotals = {}
+		end
+		if not Spy.PendingSyncTimers then
+			Spy.PendingSyncTimers = {}
+		end
 
-	-- Refresh SpyStats window if it's open
-	local SpyStats = Spy:GetModule("SpyStats", true)
-	if SpyStats and SpyStats:IsEnabled() and SpyStats:IsShown() then
-		SpyStats:Recalulate()
+		-- Add to running total for this sender
+		Spy.PendingSyncTotals[sender] = (Spy.PendingSyncTotals[sender] or 0) + entriesProcessed
+
+		-- Cancel existing timer for this sender
+		if Spy.PendingSyncTimers[sender] then
+			Spy:CancelTimer(Spy.PendingSyncTimers[sender])
+		end
+
+		-- Set timer to show summary after 2 seconds of no more chunks
+		Spy.PendingSyncTimers[sender] = Spy:ScheduleTimer(function()
+			local total = Spy.PendingSyncTotals[sender] or 0
+			if Spy.db.profile.KOSSyncNotifications and total > 0 then
+				DEFAULT_CHAT_FRAME:AddMessage(L["SpySignatureColored"]..string.format(L["KOSSyncReceived"], sender, total))
+			end
+			Spy.PendingSyncTotals[sender] = nil
+			Spy.PendingSyncTimers[sender] = nil
+
+			-- Refresh SpyStats window after sync completes
+			local SpyStats = Spy:GetModule("SpyStats", true)
+			if SpyStats and SpyStats:IsEnabled() and SpyStats:IsShown() then
+				SpyStats:Recalulate()
+			end
+		end, 2)
 	end
 end
 

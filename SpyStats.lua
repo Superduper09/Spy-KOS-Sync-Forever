@@ -654,8 +654,8 @@ function Spy:ShowGuildDetailsPopup(unit)
                 local lastUpdate = stats.lastUpdate or 0
                 local accId = stats.accountId
 
-                -- Skip if this is your own alt (already added from AccountStats)
-                local isYourAlt = accId and accId == myAccountId
+                -- Skip if this is your own character or alt (already added from AccountStats)
+                local isYourAlt = (accId and accId == myAccountId) or (guildMember == Spy.CharacterName)
                 if not isYourAlt and (wins > 0 or losses > 0) then
                     -- Add to display list
                     local displayName = guildMember
