@@ -9,6 +9,7 @@ local _
 Spy = LibStub("AceAddon-3.0"):NewAddon("Spy", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0", "AceTimer-3.0")
 Spy.Version = "2.0.8"
 Spy.DatabaseVersion = "1.1"
+Spy.KOSSyncVersion = "1.0.19"
 Spy.Signature = "[Spy]"
 Spy.ButtonLimit = 15
 Spy.MaximumPlayerLevel = MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()]
@@ -2627,6 +2628,8 @@ function Spy:HandleKOSSyncMessage(message, sender, distribution)
 			lastSyncWithRequester = 0
 		end
 		Spy:SendKOSSyncResponse(requesterName, lastSyncWithRequester)
+		-- Also broadcast our version
+		Spy:BroadcastKOSSyncVersion()
 	elseif msgType == "RSP" then
 		-- KOSR|RSP|SerializedData
 		local data = parts[3]
@@ -2640,6 +2643,10 @@ function Spy:HandleKOSSyncMessage(message, sender, distribution)
 		local timestamp = tonumber(parts[7]) or time()
 		local accountId = parts[8] or nil
 		Spy:ReceiveKOSPvPUpdate(sender, enemyName, result, wins, losses, timestamp, accountId)
+	elseif msgType == "VER" then
+		-- KOSR|VER|version
+		local theirVersion = parts[3]
+		Spy:CheckKOSSyncVersion(sender, theirVersion)
 	end
 end
 
@@ -2940,6 +2947,8 @@ function Spy:RequestKOSSync(forceFullSync)
 		DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00[KOS Sync Debug]|r Sending: "..message)
 	end
 	Spy:SendCommMessage(Spy.Signature, message, "GUILD")
+	-- Also broadcast our version so others can check for updates
+	Spy:BroadcastKOSSyncVersion()
 	if Spy.db.profile.KOSSyncNotifications then
 		DEFAULT_CHAT_FRAME:AddMessage(L["SpySignatureColored"]..L["KOSSyncSent"])
 	end
@@ -3478,6 +3487,43 @@ function Spy:BroadcastKOSPvPUpdate(enemyName, result, wins, losses)
 	local accountId = Spy.AccountID or ""
 	local message = "KOSR|PVP|"..escapedName.."|"..result.."|"..(wins or 0).."|"..(losses or 0).."|"..timestamp.."|"..accountId
 	Spy:SendCommMessage(Spy.Signature, message, "GUILD")
+end
+
+-- Broadcast KOS Sync version to guild
+function Spy:BroadcastKOSSyncVersion()
+	if not Spy.db.profile.ShareKOSReasons then return end
+	if not GetGuildInfo("player") then return end
+
+	local message = "KOSR|VER|"..Spy.KOSSyncVersion
+	Spy:SendCommMessage(Spy.Signature, message, "GUILD")
+end
+
+-- Compare version strings (returns true if v1 > v2)
+function Spy:CompareVersions(v1, v2)
+	if not v1 or not v2 then return false end
+	local p1 = {strsplit(".", v1)}
+	local p2 = {strsplit(".", v2)}
+	for i = 1, math.max(#p1, #p2) do
+		local n1 = tonumber(p1[i]) or 0
+		local n2 = tonumber(p2[i]) or 0
+		if n1 > n2 then return true end
+		if n1 < n2 then return false end
+	end
+	return false
+end
+
+-- Check received version and notify if newer
+function Spy:CheckKOSSyncVersion(sender, theirVersion)
+	if not theirVersion or theirVersion == "" then return end
+
+	-- Check if their version is newer than ours
+	if Spy:CompareVersions(theirVersion, Spy.KOSSyncVersion) then
+		-- Only notify once per session
+		if not Spy.VersionNotified then
+			Spy.VersionNotified = true
+			DEFAULT_CHAT_FRAME:AddMessage(L["SpySignatureColored"]..string.format(L["KOSNewVersionAvailable"] or "New KOS Sync version available! %s has v%s, you have v%s", sender, theirVersion, Spy.KOSSyncVersion))
+		end
+	end
 end
 
 function Spy:TrackHumanoids()

@@ -38,7 +38,7 @@ The Statistics Window contains a list of all enemy encounters which can be sorte
 If enabled, this button will be located on the enemy players target frame. Clicking on this button will add/remove the enemy target to/from the Kill On Sight list. Right clicking on the button will allow you to enter Kill on Sight reasons.
 
 |cffffd000 Author:|cffffffff Slipjack
-|cffffd000 KOS Sync Version:|cffffffff 1.0.18
+|cffffd000 KOS Sync Version:|cffffffff 1.0.19
 
 Ethan is a Noob
 ]]
@@ -559,6 +559,7 @@ L["KOSPlayerAdded"] = "%s added %s to KOS"
 L["StatsAddedBy"] = "Added By"
 L["StatsGuildWL"] = "Guild W/L"
 L["TooltipYourRecord"] = "Your Record:"
+L["KOSNewVersionAvailable"] = "New KOS Sync version available! %s has v%s, you have v%s"
 L["GuildPvPUpdate"] = "%s %s %s (%d-%d)"
 L["StatsDetailTitle"] = "Guild Details: %s"
 L["StatsDetailAddedBy"] = "Added to KOS By"
