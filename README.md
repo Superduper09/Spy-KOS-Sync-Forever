@@ -1,4 +1,4 @@
-**Spy - KOS Sync Edition**
+**Spy - KOS Sync Edition (WoW Forever)**
 
 Fork of [Spy (TBC/Classic)](https://www.curseforge.com/wow/addons/spy-tbc) with guild KOS synchronization:
 - **Real-time KOS sync** - Add/remove KOS players syncs instantly to guild
@@ -13,15 +13,15 @@ See [CHANGELOG_KOS_SYNC.md](CHANGELOG_KOS_SYNC.md) for full details.
 ## Installation
 
 ### Option 1: Download Release (Recommended)
-1. Go to [Releases](https://github.com/Superduper09/Spy-KOS-Sync/releases)
+1. Go to [Releases](https://github.com/Superduper09/Spy-KOS-Sync-Forever/releases)
 2. Download `Spy.zip` from the latest release
-3. Extract to `World of Warcraft/_anniversary_/Interface/AddOns/`
+3. Extract to `World of Warcraft/_forever_/Interface/AddOns/`
 4. Restart WoW or `/reload`
 
 ### Option 2: Git Clone
 ```
-cd "World of Warcraft/_anniversary_/Interface/AddOns"
-git clone https://github.com/Superduper09/Spy-KOS-Sync.git Spy
+cd "World of Warcraft/_forever_/Interface/AddOns"
+git clone https://github.com/Superduper09/Spy-KOS-Sync-Forever.git Spy
 ```
 To update: `cd Spy && git pull`
 

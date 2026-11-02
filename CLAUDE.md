@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Spy is a World of Warcraft addon for detecting and alerting players to the presence of nearby enemy players. It targets WoW Classic/TBC (Interface: 20505, version 2.0.8).
+Spy is a World of Warcraft addon for detecting and alerting players to the presence of nearby enemy players. It targets WoW Forever (Interface: 16001, version 2.0.9). The Anniversary/TBC version lives separately in Superduper09/Spy-KOS-Sync.
 
 ## Technology Stack
 
@@ -74,6 +74,10 @@ gh release upload <tag> Spy.zip --clobber
 ```
 
 Never upload a hand-made zip — after publishing a release, verify the `Spy.zip` asset is attached.
+
+### Commit Messages
+
+Do not add `Co-Authored-By: Claude` trailers or "Generated with Claude Code" lines to commits or pull requests in this repo.
 
 ### Slash Commands
 
